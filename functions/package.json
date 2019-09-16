@@ -1,0 +1,31 @@
+{
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "test": "tsc && functions deploy crawlDogdrip --trigger-http && functions call crawlDogdrip",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/cheerio": "^0.22.13",
+    "axios": "^0.19.0",
+    "cheerio": "^1.0.0-rc.3",
+    "crawler": "^1.2.1",
+    "firebase-admin": "^8.4.0",
+    "firebase-functions": "^3.1.0",
+    "get-youtube-id": "^1.0.1",
+    "iconv-lite": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/bull": "^3.10.2",
+    "typescript": "^3.6.2"
+  },
+  "private": true
+}
