@@ -32,7 +32,7 @@ export async function checkLinkType(domain:string) {
 export async function get_history_list() {
     let db = admin.firestore()
     var history_list:Array<string> = []
-    await db.collection('history').get()
+    await db.collection('history').limit(2000).get()
     .then(snapshot => {
         snapshot.forEach(doc => {
             history_list.push(doc.data().url)
