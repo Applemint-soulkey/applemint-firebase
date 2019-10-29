@@ -49,8 +49,8 @@ export async function crawlDogdrip() {
         }
     }
 
-    common.updateItems(itemList)
-    // console.log(itemList)
+    await common.updateItems(itemList)
+    console.log(itemList)
 
     return itemList.length
 }

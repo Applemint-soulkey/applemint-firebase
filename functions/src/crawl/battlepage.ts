@@ -52,7 +52,7 @@ export async function crawlBattlepage () {
             itemList = itemList.concat(pageItems)
         }
     }
-    common.updateItems(itemList)
+    await common.updateItems(itemList)
     console.log(itemList)
 
     return itemList.length

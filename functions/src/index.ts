@@ -36,27 +36,19 @@ export const articlizeTest = functions.https.onRequest(async (request, response)
 })
 
 exports.scheduledCrawlBp = functions.pubsub.schedule('every 3 hours').onRun(async (context)=>{
-    return bp.crawlBattlepage()
+    return await bp.crawlBattlepage()
 })
 
 exports.scheduledCrawldd = functions.pubsub.schedule('every 3 hours').onRun(async (context)=>{
-    return dd.crawlDogdrip()
+    return await dd.crawlDogdrip()
 })
 
 exports.scheduledCrawlIsg = functions.pubsub.schedule('every 3 hours').onRun(async (context)=>{
-    return isg.crawlInsagirl()
+    return await isg.crawlInsagirl()
 })
 
-exports.scheduleArticlize = functions.runWith({memory: '1GB'}).pubsub.schedule('every 5 minutes').onRun(async (context)=>{
-    return await doArticlize(new ArticleOptions(20, 'all'))
-})
-
-// 메모리 늘리기
-// 에러 처리
-// 케이스 확대
-// 처리량 설정
-
-// exports.scheduledCrawlBp = functions.pubsub.schedule('every 2 hours').onRun(async (context)=>{
-//     let urlList = await bp.crawlBattlepageUrls()
-//     bp.Articlize(urlList)
+// exports.scheduleArticlize = functions.runWith({memory: '2GB'}).pubsub.schedule('every 5 minutes').onRun(async (context)=>{
+//     return await doArticlize(new ArticleOptions(20, 'all'))
 // })
+
+// 에러 처리

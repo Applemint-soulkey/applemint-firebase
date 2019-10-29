@@ -71,7 +71,7 @@ export async function crawlInsagirl() {
         itemList = itemList.concat(hrmItems)
     }
 
-    common.updateItems(itemList)
+    await common.updateItems(itemList)
     console.log(itemList)
 
     return itemList.length

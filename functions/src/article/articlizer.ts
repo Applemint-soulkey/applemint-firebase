@@ -75,8 +75,8 @@ export async function doArticlize(options: ArticleOptions) {
                     await db.collection('item').doc(doc.id).delete()
                 }
                 else {
-                    // await db.collection('error').doc().set(Object.assign({}, article))
-                    // await db.collection('item').doc(doc.id).delete()
+                    await db.collection('error').doc().set(Object.assign({}, defaultArticle))
+                    await db.collection('item').doc(doc.id).delete()
                 }
                 resolve()
             })

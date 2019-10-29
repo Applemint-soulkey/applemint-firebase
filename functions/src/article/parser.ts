@@ -30,6 +30,8 @@ export async function bpParser(article: Article){
         article.title = article.description
         article.description = pageContent.text().trim()
 
+        //article validate
+        if(article.description == "") article.description = article.url
     } catch (error) {
         console.error('error on '+article.url)
         return null   
@@ -52,6 +54,9 @@ export async function ddParser(article: Article){
         }
         article.title = article.description
         article.description = pageContent.text().trim()
+
+        //article validate
+        if(article.description == "") article.description = article.url
     } catch (error) {
         console.error('error on '+article.url)
         console.error(error)
@@ -106,7 +111,7 @@ export async function imgurParser(article:Article){
     } catch (error) {
         console.error('error on '+article.url)
         console.error(error)
-        return article
+        return null
     }
 
     // console.log(article)
@@ -132,7 +137,7 @@ export async function youtubeParser(article: Article){
     } catch (error) {
         console.error('error on '+article.url)
         console.error(error)
-        return article
+        return null
     }
     // console.log(article)
     return article
@@ -158,7 +163,7 @@ export async function twitchParser(article: Article){
     } catch (error) {
         console.error('error on '+article.url)
         console.error(error)
-        return article
+        return null
     }
 
     // console.log(article)
@@ -176,7 +181,7 @@ export async function defaultParser(article: Article){
     } catch (error) {
         console.error('error on '+article.url)
         console.error(error)
-        return article
+        return null
     }
     // console.log(article)
     return article
