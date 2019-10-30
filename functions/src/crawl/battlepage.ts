@@ -30,11 +30,11 @@ async function getBattlepageItems(target: string){
     let history: Array<string> = await common.get_history_list()
     let itemList: Array<bpItem> = []
     let response = await Axios.get(target)
-    let $ = await cheerio.load(response.data)
+    let $ = cheerio.load(response.data)
     let $table = $('div[class="ListTable"]')
-    await $table.find('td.bp_subject').each(async(_: number, element: any) => {
-        let element_url = await $(element).find('a').attr('href')
-        var item = await new bpItem(element_url, element.attribs.title)
+    $table.find('td.bp_subject').each(async(_: number, element: any) => {
+        let element_url = $(element).find('a').attr('href')
+        var item = new bpItem(element_url, element.attribs.title)
         if(!history.includes(item.url)){
             itemList.push(item)
         }

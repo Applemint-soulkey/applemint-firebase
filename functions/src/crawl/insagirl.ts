@@ -54,7 +54,7 @@ async function getInsagirlItems(json: string){
             if(insaItemContent.length === 0){
                 insaItemContent = ''
             }
-            let item = await new isgItem(insaItemUrl, insaItemContent)
+            let item = new isgItem(insaItemUrl, insaItemContent)
             itemList.push(item)
         }
     }

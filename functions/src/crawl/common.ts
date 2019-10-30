@@ -32,7 +32,7 @@ export async function checkLinkType(domain:string) {
 export async function get_history_list() {
     let db = admin.firestore()
     var history_list:Array<string> = []
-    await db.collection('history').limit(2000).get()
+    await db.collection('history').orderBy('timestamp', 'desc').limit(2000).get()
     .then(snapshot => {
         snapshot.forEach(doc => {
             history_list.push(doc.data().url)
@@ -48,7 +48,7 @@ export async function updateItems(itemList: Array<Item>){
     let batch_cnt = 0
     var batch_list = []
     for(var item of itemList){
-        let itemRef = db.collection('item').doc()
+        let itemRef = db.collection('article').doc()
         let historyRef = db.collection('history').doc()
         batch.set(itemRef, Object.assign({}, item))
         batch.set(historyRef, {

@@ -25,12 +25,12 @@ async function getDogdripItems(target: string) {
     let history: Array<string> = await common.get_history_list()
     let itemList: Array<ddItem> = []
     let response = await Axios.get(target)
-    let $ = await cheerio.load(response.data)
+    let $ = cheerio.load(response.data)
     let $table = $('tbody' ,'table[class="ed table table-divider"]')
-    await $table.find('.ed.link-reset').each(async (_, element) => {
+    $table.find('.ed.link-reset').each(async (_, element) => {
         let element_url = element.attribs.href
         let element_content = $(element).find('.ed.title-link').text()
-        var item = await new ddItem(element_url, element_content)
+        var item = new ddItem(element_url, element_content)
         if(!history.includes(item.url) && item.url != '#popup_menu_area'){
             itemList.push(item)
         }
