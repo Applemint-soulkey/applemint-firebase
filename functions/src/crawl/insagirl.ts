@@ -17,11 +17,13 @@ class isgItem implements common.Item {
     host: string;
     textContent: string;
     timestamp: Date;
+    state: string
 
     constructor(url: string, content: string) {
         this.url = url
         this.textContent = content
         this.timestamp = new Date()
+        this.state = 'new'
         try{
             let tempUrl = new URL(url)
             this.host = tempUrl.origin

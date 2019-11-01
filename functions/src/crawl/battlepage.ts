@@ -13,12 +13,14 @@ class bpItem implements common.Item {
     type: string
     textContent: string
     timestamp: Date
+    state: string
 
     constructor(url: string, title: string){
         this.url = this.url_formatter(url)
         this.type = 'battlepage'
         this.textContent = title
         this.timestamp = new Date()
+        this.state = "new"
     }
 
     url_formatter(url:string){

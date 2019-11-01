@@ -12,12 +12,14 @@ class ddItem implements common.Item {
     type: string;
     textContent: string;
     timestamp: Date;
+    state: string
 
     constructor(url: string, content: string){
         this.url = url
         this.type = 'dogdrip'
         this.textContent = content
         this.timestamp = new Date()
+        this.state = 'new'
     }
 }
 

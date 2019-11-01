@@ -5,6 +5,7 @@ export interface Item {
     type: string;
     textContent: string;
     timestamp: Date;
+    state: string;
 }
 
 export async function checkLinkType(domain:string) {
