@@ -12,18 +12,20 @@ var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)/g
 var directLinkRegex = /(\.mp4)|(\.jpg)|(\.png)|(\.gif)/g
 
 class isgItem implements common.Item {
-    url: string;
-    type: string;
-    host: string;
-    textContent: string;
-    timestamp: Date;
+    url: string
+    type: string
+    host: string
+    textContent: string
+    timestamp: Date
     state: string
+    crawlSource: string
 
     constructor(url: string, content: string) {
         this.url = url
         this.textContent = content
         this.timestamp = new Date()
         this.state = 'new'
+        this.crawlSource = 'isg'
         try{
             let tempUrl = new URL(url)
             this.host = tempUrl.origin
@@ -42,7 +44,8 @@ class isgItem implements common.Item {
 }
 
 async function getInsagirlItems(json: string){
-    let history: Array<string> = await common.get_history_list()
+    // let history: Array<string> = await common.get_history_list()
+    let history: Array<string> = await common.get_history_by_type('isg')
     let itemList: Array<isgItem> = []
     for (var line of json){
         let detail: string = line.split('|')[2]

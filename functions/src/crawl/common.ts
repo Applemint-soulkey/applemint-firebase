@@ -1,11 +1,12 @@
 import * as admin from 'firebase-admin'
 
 export interface Item {
-    url: string;
-    type: string;
-    textContent: string;
-    timestamp: Date;
-    state: string;
+    url: string
+    type: string
+    textContent: string
+    timestamp: Date
+    state: string
+    crawlSource: string
 }
 
 export async function checkLinkType(domain:string) {
@@ -43,6 +44,58 @@ export async function get_history_list() {
     return history_list
 }
 
+export async function get_history_by_type(type: String){
+    let db = admin.firestore()
+    var history: Array<string> = []
+
+    switch(type) {
+        case 'bp':
+            await db.collection('history')
+            .where('source', '==', 'bp')
+            .orderBy('timestamp', 'desc')
+            .limit(3000)
+            .get().then(snapshot => {
+                snapshot.forEach(doc=> {
+                    history.push(doc.data().url)
+                })
+            })
+            break
+        case 'dd':
+            await db.collection('history')
+            .where('source', '==', 'dd')
+            .orderBy('timestamp', 'desc')
+            .limit(3000)
+            .get().then(snapshot => {
+                snapshot.forEach(doc=> {
+                    history.push(doc.data().url)
+                })
+            })
+            break
+        case 'isg':
+            await db.collection('history')
+            .where('source', '==', 'isg')
+            .orderBy('timestamp', 'desc')
+            .limit(3000)
+            .get().then(snapshot => {
+                snapshot.forEach(doc=> {
+                    history.push(doc.data().url)
+                })
+            })
+            break
+        default:
+            await db.collection('history')
+            .orderBy('timestamp', 'desc')
+            .limit(5000).get()
+            .then(snapshot => {
+                snapshot.forEach(doc => {
+                    history.push(doc.data().url)
+                })
+            })
+            break
+    }
+    return history
+}
+
 export async function updateItems(itemList: Array<Item>){
     let db = admin.firestore()
     let batch = db.batch()
@@ -54,6 +107,7 @@ export async function updateItems(itemList: Array<Item>){
         batch.set(itemRef, Object.assign({}, item))
         batch.set(historyRef, {
             url: item.url,
+            source: item.crawlSource,
             timestamp: item.timestamp
         })
         batch_cnt += 2

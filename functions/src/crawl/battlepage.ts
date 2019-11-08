@@ -14,6 +14,7 @@ class bpItem implements common.Item {
     textContent: string
     timestamp: Date
     state: string
+    crawlSource: string
 
     constructor(url: string, title: string){
         this.url = this.url_formatter(url)
@@ -21,6 +22,7 @@ class bpItem implements common.Item {
         this.textContent = title
         this.timestamp = new Date()
         this.state = "new"
+        this.crawlSource = "bp"
     }
 
     url_formatter(url:string){
@@ -29,7 +31,8 @@ class bpItem implements common.Item {
 }
 
 async function getBattlepageItems(target: string){
-    let history: Array<string> = await common.get_history_list()
+    // let history: Array<string> = await common.get_history_list()
+    let history: Array<string> = await common.get_history_by_type('bp')
     let itemList: Array<bpItem> = []
     let response = await Axios.get(target)
     let $ = cheerio.load(response.data)

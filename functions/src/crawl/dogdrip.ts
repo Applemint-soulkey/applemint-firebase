@@ -8,11 +8,12 @@ const target_list = [
 ]
 
 class ddItem implements common.Item {
-    url: string;
-    type: string;
-    textContent: string;
-    timestamp: Date;
+    url: string
+    type: string
+    textContent: string
+    timestamp: Date
     state: string
+    crawlSource: string
 
     constructor(url: string, content: string){
         this.url = url
@@ -20,11 +21,13 @@ class ddItem implements common.Item {
         this.textContent = content
         this.timestamp = new Date()
         this.state = 'new'
+        this.crawlSource = 'dd'
     }
 }
 
 async function getDogdripItems(target: string) {
-    let history: Array<string> = await common.get_history_list()
+    // let history: Array<string> = await common.get_history_list()
+    let history: Array<string> = await common.get_history_by_type('dd')
     let itemList: Array<ddItem> = []
     let response = await Axios.get(target)
     let $ = cheerio.load(response.data)
