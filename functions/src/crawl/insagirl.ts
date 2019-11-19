@@ -45,6 +45,8 @@ async function getInsagirlItems(json: string) {
   // let history: Array<string> = await common.get_history_list()
   let history: Array<string> = await common.get_history_by_type("isg");
   let itemList: Array<isgItem> = [];
+  let insertedUrl: Array<string> = [];
+
   for (var line of json) {
     let detail: string = line.split("|")[2];
     let detail_url_list = detail.match(urlRegex);
@@ -52,6 +54,7 @@ async function getInsagirlItems(json: string) {
       let insaItemUrl = detail_url_list[0];
       if (
         history.includes(insaItemUrl) ||
+        insertedUrl.includes(insaItemUrl) ||
         insaItemUrl.search(ignoreRegex) !== -1
       ) {
         continue;
@@ -62,6 +65,7 @@ async function getInsagirlItems(json: string) {
       }
       let item = new isgItem(insaItemUrl, insaItemContent);
       itemList.push(item);
+      insertedUrl.push(item.url);
     }
   }
   return itemList;
