@@ -28,7 +28,7 @@ export async function checkLinkType(domain: string) {
   if (domain.includes("fmkorea")) {
     return "fmkorea";
   }
-  if (domain.includes("twiiter")) {
+  if (domain.includes("twitter")) {
     return "twitter";
   }
   if (domain.includes("dcinside")) {
