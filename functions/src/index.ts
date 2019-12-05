@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import * as bp from "./crawl/battlepage";
 import * as dd from "./crawl/dogdrip";
 import * as isg from "./crawl/insagirl";
+import analyzeArticle from "./analyze/test";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -27,6 +28,13 @@ export const crawlInsagirl = functions.https.onRequest(
   async (request, response) => {
     isg.crawlInsagirl();
     response.send("Crawl Insagirl Request Called");
+  }
+);
+
+export const testAnalyze = functions.https.onRequest(
+  async (request, response) => {
+    let data = await analyzeArticle("0398oYmJM3yHmwSdjfvD");
+    response.send(data);
   }
 );
 
