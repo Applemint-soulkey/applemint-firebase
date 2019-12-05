@@ -13,7 +13,7 @@ const analyzeArticle = async (fbId: string) => {
         console.log("No such document!");
       } else {
         let targetDocument = document.data();
-        result = await parserFactory(targetDocument);
+        result = await parserFactory(targetDocument, document.id);
       }
     })
     .catch(error => {

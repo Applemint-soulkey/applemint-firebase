@@ -33,7 +33,7 @@ export const crawlInsagirl = functions.https.onRequest(
 
 export const testAnalyze = functions.https.onRequest(
   async (request, response) => {
-    let data = await analyzeArticle("0398oYmJM3yHmwSdjfvD");
+    let data = await analyzeArticle(request.query.id);
     response.send(data);
   }
 );

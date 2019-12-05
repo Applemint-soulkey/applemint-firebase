@@ -1,11 +1,13 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-var getYoutubeID = require("get-youtube-id");
+const getYoutubeID = require("get-youtube-id");
+const functions = require("firebase-functions");
 
 class AnalyzeResult {
   targetUrl: string = "";
   targetFbId: string = "";
   title: string = "";
+  description: string = "";
   midiContents: Array<string> = [];
   extContents: Array<string> = [];
 
@@ -19,15 +21,15 @@ class AnalyzeResult {
 }
 
 // const twitchApi = "https://api.twitch.tv/helix/clips";
-const youtubeKey = process.env.ANALYZE_YOUTUBE_KEY;
+const youtubeKey = functions.config().youtubeapi.key;
 const youtubeApi = "https://www.googleapis.com/youtube/v3/videos";
 const imgurAlbumApi = "https://api.imgur.com/3/album/";
 const imgurImageApi = "https://api.imgur.com/3/image/";
 const imgurAuth = {
-  Authorization: "Client-ID " + process.env.ANALYZE_IMGUR_KEY
+  Authorization: "Client-ID " + functions.config().imgurapi.key
 };
 const twitchAuth = {
-  "Client-ID": process.env.ANALYZE_TWITCH_KEY
+  "Client-ID": functions.config().twitchapi.key
 };
 
 const extractTags = (
@@ -36,28 +38,28 @@ const extractTags = (
   attrName: string = "src"
 ) => {
   let tagSrcs: Array<string> = [];
-  let tagElements = contentElement.find(tagName);
-  tagElements.map((index: number, element: any) => {
-    tagSrcs.push(element.attribs[attrName]);
-  });
+  try {
+    let tagElements = contentElement.find(tagName);
+    tagElements.map((index: number, element: any) => {
+      if (element.attribs[attrName] !== undefined) {
+        tagSrcs.push(element.attribs[attrName]);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
   return tagSrcs;
 };
 
-const bpParser = async (url: string, fb_id: string) => {
+const bpParser = async (document: any, fb_id: string) => {
   let bpItem = new AnalyzeResult();
-  bpItem.targetUrl = url;
+  bpItem.targetUrl = document.url;
   bpItem.targetFbId = fb_id;
+  bpItem.title = document.textContent;
 
   try {
-    let response = await axios.get(url);
+    let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
-
-    // Get Title
-    bpItem.title = $("title")
-      .text()
-      .replace(" - BATTLEPAGE.COM v12", "")
-      .replace("유머 게시판 - ", "")
-      .replace("기타 게시판 - ", "");
     let pageElement = $(".search_content");
 
     // Get img Tag
@@ -74,23 +76,17 @@ const bpParser = async (url: string, fb_id: string) => {
   } catch (error) {
     console.error(error);
   }
-  bpItem.printInfo();
-
   return bpItem;
 };
 
-const ddParser = async (url: string, fb_id: string) => {
+const ddParser = async (document: any, fb_id: string) => {
   let ddItem = new AnalyzeResult();
-  ddItem.targetUrl = url;
+  ddItem.targetUrl = document.url;
   ddItem.targetFbId = fb_id;
+  ddItem.title = document.textContent;
   try {
-    let response = await axios.get(url);
+    let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
-
-    ddItem.title = $("title")
-      .text()
-      .replace(" - DogDrip.Net 개드립", "");
-
     let pageElement = await $("#article_1");
 
     extractTags(pageElement, "img").map((value, _) => {
@@ -103,6 +99,11 @@ const ddParser = async (url: string, fb_id: string) => {
         value.includes("/dvs/") ? "https://www.dogdrip.net" + value : value
       );
     });
+    extractTags(pageElement, "source").map((value, index) => {
+      ddItem.midiContents.push(
+        value.includes("/dvs/") ? "https://www.dogdrip.net" + value : value
+      );
+    });
     extractTags(pageElement, "iframe").map((value: string, _) => {
       ddItem.extContents.push(
         value.includes("https:") ? value : "https:" + value
@@ -111,16 +112,15 @@ const ddParser = async (url: string, fb_id: string) => {
   } catch (error) {
     console.error(error);
   }
-  ddItem.printInfo();
   return ddItem;
 };
 
-const fmParser = async (url: string, fb_id: string) => {
+const fmParser = async (document: any, fb_id: string) => {
   let item = new AnalyzeResult();
-  item.targetUrl = url;
+  item.targetUrl = document.url;
   item.targetFbId = fb_id;
   try {
-    let response = await axios.get(url);
+    let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
     let pageContent = await $("article");
 
@@ -138,18 +138,18 @@ const fmParser = async (url: string, fb_id: string) => {
   } catch (error) {
     console.error(error);
   }
-  item.printInfo();
   return item;
 };
 
-const imgurParser = async (url: string, fb_id: string) => {
+const imgurParser = async (document: any, fb_id: string) => {
   let item = new AnalyzeResult();
-  item.targetUrl = url;
+  item.targetUrl = document.url;
   item.targetFbId = fb_id;
+  item.title = document.textContent === "" ? "Imgur" : document.textContent;
 
   const albumKeyword = "/a/";
-  let imgurHash = url.split("/").pop();
-  if (url.includes(albumKeyword)) {
+  let imgurHash = document.url.split("/").pop();
+  if (document.url.includes(albumKeyword)) {
     //album
     let imgurResponse = await axios.get(imgurAlbumApi + imgurHash + "/images", {
       headers: imgurAuth
@@ -166,39 +166,39 @@ const imgurParser = async (url: string, fb_id: string) => {
     let imgData = await imgurResponse.data.data;
     item.midiContents.push(imgData.link);
   }
-
-  item.printInfo();
   return item;
 };
 
-const youtubeParser = async (url: string, fb_id: string) => {
+const youtubeParser = async (document: any, fb_id: string) => {
   let item = new AnalyzeResult();
-  item.targetUrl = url;
+  item.targetUrl = document.url;
   item.targetFbId = fb_id;
+  item.description = document.textContent;
 
-  let youtubeId = await getYoutubeID(url);
-  if (youtubeId !== null) {
+  let youtubeId = await getYoutubeID(document.url);
+  if (youtubeId !== null && youtubeId !== undefined) {
     let query = "?key=" + youtubeKey + "&part=snippet&id=" + youtubeId;
     let videoData = await axios.get(youtubeApi + query);
     let videoItem = await videoData.data.items[0].snippet;
     item.title = videoItem.title;
     item.midiContents.push(videoItem.thumbnails.default.url);
   }
-  item.printInfo();
   return item;
 };
 
-const twitchParser = async (url: string, fb_id: string) => {
+const twitchParser = async (document: any, fb_id: string) => {
   let item = new AnalyzeResult();
-  item.targetUrl = url;
+  item.targetUrl = document.url;
   item.targetFbId = fb_id;
+  item.description = document.textContent;
+
   let tgdRegex = /tgd\.kr/g;
   let clipIdRegex = /([A-Z])\w+/g;
-  let clipUrl = url;
+  let clipUrl = document.url;
 
-  if (tgdRegex.test(url)) {
+  if (tgdRegex.test(document.url)) {
     //tgd
-    let response = await axios.get(url);
+    let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
     clipUrl = await $("#clip-iframe").attr("src");
   }
@@ -215,26 +215,48 @@ const twitchParser = async (url: string, fb_id: string) => {
   );
   item.title = basicResponse.data.title;
   item.midiContents.push(statusResponse.data.quality_options[0].source);
-  item.printInfo();
   return item;
 };
 
-const parserFactory = async (document: any) => {
+const defaultParser = async (document: any, fb_id: string) => {
+  let item = new AnalyzeResult();
+  item.targetUrl = document.url;
+  item.targetFbId = fb_id;
+  item.description = document.textContent;
+  try {
+    let response = await axios.get(document.url);
+    let $ = cheerio.load(response.data);
+    item.title = $("title").text();
+  } catch (error) {
+    console.error(error);
+  }
+  return item;
+};
+
+const parserFactory = async (document: any, fb_id: string) => {
   let result = new AnalyzeResult();
   switch (document.type) {
     case "battlepage":
+      result = await bpParser(document, fb_id);
       break;
     case "dogdrip":
+      result = await ddParser(document, fb_id);
       break;
     case "fmkorea":
+      result = await fmParser(document, fb_id);
       break;
     case "imgur":
+      result = await imgurParser(document, fb_id);
       break;
     case "youtube":
+      result = await youtubeParser(document, fb_id);
       break;
     case "twitch":
+      result = await twitchParser(document, fb_id);
       break;
-      deafult: break;
+    default:
+      result = await defaultParser(document, fb_id);
+      break;
   }
   return result;
 };
