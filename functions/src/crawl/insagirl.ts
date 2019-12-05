@@ -7,7 +7,8 @@ let target_list = [
   "http://insagirl-hrm.appspot.com/json2/2/1/2/"
 ];
 
-var urlRegex = /(https?:[^\s]+)/g;
+var httpRegex = /(https?:[^\s]+)/g;
+var urlRegex = /(?:(?:https?|ftp):\/\/|\b(?:[a-z\d]+\.))(?:(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))?\))+(?:\((?:[^\s()<>]+|(?:\(?:[^\s()<>]+\)))?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))?/g;
 var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)/g;
 var directLinkRegex = /(\.mp4)|(\.jpg)|(\.png)|(\.gif)/g;
 
@@ -27,7 +28,11 @@ class isgItem implements common.Item {
     this.state = "new";
     this.crawlSource = "isg";
     try {
+      if (!httpRegex.test(url)) {
+        url = "https://" + url;
+      }
       let tempUrl = new URL(url);
+      this.url = url;
       this.host = tempUrl.origin;
       this.type = "default";
       common.checkLinkType(this.host).then(type => {
