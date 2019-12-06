@@ -4,6 +4,7 @@ import * as bp from "./crawl/battlepage";
 import * as dd from "./crawl/dogdrip";
 import * as isg from "./crawl/insagirl";
 import analyzeArticle from "./analyze/test";
+import remove from "./analyze/remover";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -37,6 +38,16 @@ export const testAnalyze = functions.https.onRequest(
     response.send(data);
   }
 );
+
+export const analyze = functions.https.onCall(async (data, context) => {
+  let analyzeRes = await analyzeArticle(data.id);
+  return analyzeRes;
+});
+
+export const remover = functions.https.onRequest(async (request, response) => {
+  let list = await remove();
+  response.send(list);
+});
 
 exports.scheduledCrawlBp = functions.pubsub
   .schedule("every 3 hours")

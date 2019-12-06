@@ -7,10 +7,10 @@ let target_list = [
   "http://insagirl-hrm.appspot.com/json2/2/1/2/"
 ];
 
-var httpRegex = /(https?:[^\s]+)/g;
-var urlRegex = /(?:(?:https?|ftp):\/\/|\b(?:[a-z\d]+\.))(?:(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))?\))+(?:\((?:[^\s()<>]+|(?:\(?:[^\s()<>]+\)))?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))?/g;
-var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)/g;
-var directLinkRegex = /(\.mp4)|(\.jpg)|(\.png)|(\.gif)/g;
+var httpRegex = /(https?:[^\s]+)/;
+var urlRegex = /(?:(?:https?|ftp):\/\/|\b(?:[a-z\d]+\.))(?:(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))?\))+(?:\((?:[^\s()<>]+|(?:\(?:[^\s()<>]+\)))?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))?/;
+var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)/;
+var directLinkRegex = /(\.mp4)|(\.jpg)|(\.png)|(\.gif)/;
 
 class isgItem implements common.Item {
   url: string;
@@ -32,7 +32,6 @@ class isgItem implements common.Item {
         url = "https://" + url;
       }
       let tempUrl = new URL(url);
-      this.url = url;
       this.host = tempUrl.origin;
       this.type = "default";
       common.checkLinkType(this.host).then(type => {
