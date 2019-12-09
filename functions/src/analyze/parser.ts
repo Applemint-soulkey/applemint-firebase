@@ -25,6 +25,7 @@ const youtubeKey = functions.config().youtubeapi.key;
 const youtubeApi = "https://www.googleapis.com/youtube/v3/videos";
 const imgurAlbumApi = "https://api.imgur.com/3/album/";
 const imgurImageApi = "https://api.imgur.com/3/image/";
+const imgurGalleryApi = "https://api.imgur.com/3/gallery/";
 const imgurAuth = {
   Authorization: "Client-ID " + functions.config().imgurapi.key
 };
@@ -124,6 +125,7 @@ const fmParser = async (document: any, fb_id: string) => {
     let $ = cheerio.load(response.data);
     let pageContent = await $("article");
 
+    item.title = $("title").text();
     extractTags(pageContent, "img").map((value, index) => {
       item.midiContents.push(
         value.includes("https:") ? value : "https:" + value
@@ -148,6 +150,7 @@ const imgurParser = async (document: any, fb_id: string) => {
   item.title = document.textContent === "" ? "Imgur" : document.textContent;
 
   const albumKeyword = "/a/";
+  const galleryKeyword = "/gallery/";
   let imgurHash = document.url.split("/").pop();
   if (document.url.includes(albumKeyword)) {
     //album
@@ -155,6 +158,15 @@ const imgurParser = async (document: any, fb_id: string) => {
       headers: imgurAuth
     });
     let imgDataList = await imgurResponse.data.data;
+    imgDataList.map((data: any, _: any) => {
+      item.midiContents.push(data.link);
+    });
+  } else if (document.url.includes(galleryKeyword)) {
+    //gallery
+    let imgurResponse = await axios.get(imgurGalleryApi + imgurHash, {
+      headers: imgurAuth
+    });
+    let imgDataList = await imgurResponse.data.data.images;
     imgDataList.map((data: any, _: any) => {
       item.midiContents.push(data.link);
     });
@@ -218,6 +230,16 @@ const twitchParser = async (document: any, fb_id: string) => {
   return item;
 };
 
+const directParser = async (document: any, fb_id: string) => {
+  let item = new AnalyzeResult();
+  item.targetUrl = document.url;
+  item.targetFbId = fb_id;
+  item.description = document.textContent;
+  item.title = document.textContent;
+  item.midiContents.push(document.url);
+  return item;
+};
+
 const defaultParser = async (document: any, fb_id: string) => {
   let item = new AnalyzeResult();
   item.targetUrl = document.url;
@@ -253,6 +275,9 @@ const parserFactory = async (document: any, fb_id: string) => {
       break;
     case "twitch":
       result = await twitchParser(document, fb_id);
+      break;
+    case "direct":
+      result = await directParser(document, fb_id);
       break;
     default:
       result = await defaultParser(document, fb_id);
