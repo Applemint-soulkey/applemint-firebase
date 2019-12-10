@@ -5,6 +5,7 @@ import * as dd from "./crawl/dogdrip";
 import * as isg from "./crawl/insagirl";
 import analyzeArticle from "./analyze/test";
 import remove from "./analyze/remover";
+import { sendMessage } from "./message/message";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -13,22 +14,34 @@ admin.initializeApp(functions.config().firebase);
 
 export const crawlBattlepage = functions.https.onRequest(
   async (request, response) => {
-    bp.crawlBattlepage();
-    response.send("Crawl Battlepage Request Called");
+    let crawledSize = await bp.crawlBattlepage();
+    sendMessage(
+      "Article Update",
+      "Battlepage Articles Updated. Check Your Article!"
+    );
+    response.send("Crawl Battlepage Request Called: " + crawledSize);
   }
 );
 
 export const crawlDogdrip = functions.https.onRequest(
   async (request, response) => {
-    dd.crawlDogdrip();
-    response.send("Crawl Dogdrip Request Called");
+    let crawledSize = await dd.crawlDogdrip();
+    sendMessage(
+      "Article Update",
+      "Dogdrip Articles Updated. Check Your Article!"
+    );
+    response.send("Crawl Dogdrip Request Called: " + crawledSize);
   }
 );
 
 export const crawlInsagirl = functions.https.onRequest(
   async (request, response) => {
-    isg.crawlInsagirl();
-    response.send("Crawl Insagirl Request Called");
+    let crawledSize = await isg.crawlInsagirl();
+    sendMessage(
+      "Article Update",
+      "Insagirl Articles Updated. Check Your Article!"
+    );
+    response.send("Crawl Insagirl Request Called: " + crawledSize);
   }
 );
 
@@ -52,19 +65,34 @@ export const remover = functions.https.onRequest(async (request, response) => {
 exports.scheduledCrawlBp = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
-    return await bp.crawlBattlepage();
+    let crawledSize = await bp.crawlBattlepage();
+    sendMessage(
+      "Article Update",
+      "Battlepage Articles Updated. Check Your Article!"
+    );
+    return { msg: crawledSize + " articls updated from bp" };
   });
 
 exports.scheduledCrawldd = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
-    return await dd.crawlDogdrip();
+    let crawledSize = await dd.crawlDogdrip();
+    sendMessage(
+      "Article Update",
+      "Dogdrip Articles Updated. Check Your Article!"
+    );
+    return { msg: crawledSize + " articls updated from dd" };
   });
 
 exports.scheduledCrawlIsg = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
-    return await isg.crawlInsagirl();
+    let crawledSize = await isg.crawlInsagirl();
+    sendMessage(
+      "Article Update",
+      "Insagirl Articles Updated. Check Your Article!"
+    );
+    return { msg: crawledSize + " articls updated from isg" };
   });
 
 // exports.scheduleArticlize = functions.runWith({memory: '2GB'}).pubsub.schedule('every 5 minutes').onRun(async (context)=>{
