@@ -127,9 +127,19 @@ const fmParser = async (document: any, fb_id: string) => {
 
     item.title = $("title").text();
     extractTags(pageContent, "img").map((value, index) => {
-      item.midiContents.push(
-        value.includes("https:") ? value : "https:" + value
-      );
+      if (value !== "//image.fmkorea.com/classes/lazy/img/transparent.gif") {
+        item.midiContents.push(
+          value.includes("https:") ? value : "https:" + value
+        );
+      }
+    });
+
+    extractTags(pageContent, "img", "data-original").map((value, index) => {
+      if (value !== undefined) {
+        item.midiContents.push(
+          value.includes("https:") ? value : "https:" + value
+        );
+      }
     });
 
     extractTags(pageContent, "source").map((value, index) => {
