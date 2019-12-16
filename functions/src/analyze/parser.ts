@@ -226,17 +226,14 @@ const twitchParser = async (document: any, fb_id: string) => {
   }
   let slug = clipUrl.match(clipIdRegex)![0];
   let basicResponse = await axios.get(
-    "https://clips.twitch.tv/api/v2/clips/" + slug,
+    "https://api.twitch.tv/helix/clips?id=" + slug,
     { headers: twitchAuth }
   );
-  let statusResponse = await axios.get(
-    "https://clips.twitch.tv/api/v2/clips/" + slug + "/status",
-    {
-      headers: twitchAuth
-    }
-  );
-  item.title = basicResponse.data.title;
-  item.midiContents.push(statusResponse.data.quality_options[0].source);
+  let clipData = basicResponse.data.data[0];
+  item.title = clipData.title;
+  let thumb: string = clipData.thumbnail_url;
+  let download_url = thumb.slice(0, thumb.indexOf("-preview-")) + ".mp4";
+  item.midiContents.push(download_url);
   return item;
 };
 
