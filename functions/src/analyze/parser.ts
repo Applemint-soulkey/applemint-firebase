@@ -176,10 +176,16 @@ const imgurParser = async (document: any, fb_id: string) => {
     let imgurResponse = await axios.get(imgurGalleryApi + imgurHash, {
       headers: imgurAuth
     });
-    let imgDataList = await imgurResponse.data.data.images;
-    imgDataList.map((data: any, _: any) => {
-      item.midiContents.push(data.link);
-    });
+    let isAlbum = await imgurResponse.data.data.is_album;
+    if (isAlbum) {
+      let imgDataList = await imgurResponse.data.data.images;
+      imgDataList.map((data: any, _: any) => {
+        item.midiContents.push(data.link);
+      });
+    } else {
+      let imgData = await imgurResponse.data.data.link;
+      item.midiContents.push(imgData);
+    }
   } else {
     //single
     let imgurResponse = await axios.get(imgurImageApi + imgurHash, {
