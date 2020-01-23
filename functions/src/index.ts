@@ -68,7 +68,7 @@ exports.scheduledCrawlBp = functions.pubsub
     let crawledSize = await bp.crawlBattlepage();
     sendMessage(
       "Article Update",
-      "Battlepage Articles Updated. Check Your Article!"
+      crawledSize + " Battlepage Articles Updated."
     );
     return { msg: crawledSize + " articls updated from bp" };
   });
@@ -77,10 +77,7 @@ exports.scheduledCrawldd = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
     let crawledSize = await dd.crawlDogdrip();
-    sendMessage(
-      "Article Update",
-      "Dogdrip Articles Updated. Check Your Article!"
-    );
+    sendMessage("Article Update", crawledSize + " Dogdrip Articles Updated.");
     return { msg: crawledSize + " articls updated from dd" };
   });
 
@@ -88,10 +85,7 @@ exports.scheduledCrawlIsg = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
     let crawledSize = await isg.crawlInsagirl();
-    sendMessage(
-      "Article Update",
-      "Insagirl Articles Updated. Check Your Article!"
-    );
+    sendMessage("Article Update", crawledSize + " Insagirl Articles Updated.");
     return { msg: crawledSize + " articls updated from isg" };
   });
 
