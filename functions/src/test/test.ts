@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import analyzeArticle from "../analyze/analyzer";
 
 const remove = async () => {
   let removeList: Array<string> = [];
@@ -31,4 +32,26 @@ const remove = async () => {
   return removeList;
 };
 
-export default remove;
+const makeTestArticle = async () => {
+  let db = admin.firestore();
+  await db
+    .collection("article")
+    .doc()
+    .set({
+      crawlSource: "etc",
+      state: "new",
+      textContent: "TestCase",
+      timestamp: new Date(),
+      type: "etc",
+      url: "https://applemint.netlify.com"
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+const testAnalyze = async (fbId: string) => {
+  return await analyzeArticle(fbId);
+};
+
+export { makeTestArticle, testAnalyze, remove };
