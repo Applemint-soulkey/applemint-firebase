@@ -121,9 +121,12 @@ const fmParser = async (document: any, fb_id: string) => {
   item.targetUrl = document.url;
   item.targetFbId = fb_id;
   try {
+    console.log("phase 0");
+    console.log(document.url);
     let response = await axios.get(document.url);
+    console.log("phase 1");
     let $ = cheerio.load(response.data);
-    let pageContent = await $("article");
+    let pageContent = $("article");
 
     item.title = $("title").text();
     extractTags(pageContent, "img").map((value, index) => {
