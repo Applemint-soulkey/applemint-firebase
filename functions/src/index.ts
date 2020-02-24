@@ -4,6 +4,7 @@ import * as bp from "./crawl/battlepage";
 import * as dd from "./crawl/dogdrip";
 import * as isg from "./crawl/insagirl";
 import * as test from "./test/test";
+import * as raindrop from "./test/raindrop";
 import analyzeArticle from "./analyze/analyzer";
 import { sendMessage } from "./message/message";
 
@@ -22,6 +23,29 @@ export const analyze = functions
       return error;
     }
   });
+
+exports.getRaindropCollections = functions.https.onCall(
+  async (data, context) => {
+    try {
+      return await raindrop.getCollections();
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
+exports.createRaindrop = functions.https.onCall(async (data, context) => {
+  try {
+    return await raindrop.createRaindrop(
+      data.title,
+      data.url,
+      data.collection,
+      data.tags
+    );
+  } catch (error) {
+    return error;
+  }
+});
 
 // Scheduled Functions
 
