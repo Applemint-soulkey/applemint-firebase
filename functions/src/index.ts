@@ -1,10 +1,12 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import * as common from "./crawl/common";
 import * as bp from "./crawl/battlepage";
 import * as dd from "./crawl/dogdrip";
 import * as isg from "./crawl/insagirl";
 import * as test from "./test/test";
-import analyzeArticle from "./analyze/analyzer";
+import * as raindrop from "./util/raindrop";
+import analyzeArticle from "./util/analyzer";
 import { sendMessage } from "./message/message";
 
 admin.initializeApp(functions.config().firebase);
@@ -23,15 +25,43 @@ export const analyze = functions
     }
   });
 
+exports.getRaindropCollections = functions.https.onCall(
+  async (data, context) => {
+    try {
+      return await raindrop.getCollections();
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
+exports.createRaindrop = functions.https.onCall(async (data, context) => {
+  try {
+    return await raindrop.createRaindrop(
+      data.title,
+      data.url,
+      data.collection,
+      data.tags
+    );
+  } catch (error) {
+    return error;
+  }
+});
+
 // Scheduled Functions
 
 exports.scheduledCrawlBp = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
     let crawledSize = await bp.crawlBattlepage();
+    let articleCnt = await common.getArticleCount();
+
     sendMessage(
       "Article Update",
-      crawledSize + " Battlepage Articles Updated."
+      crawledSize +
+        " Articles update from Battlepage.\n" +
+        articleCnt +
+        " articles remain"
     );
     return { msg: crawledSize + " articls updated from bp" };
   });
@@ -40,7 +70,15 @@ exports.scheduledCrawldd = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
     let crawledSize = await dd.crawlDogdrip();
-    sendMessage("Article Update", crawledSize + " Dogdrip Articles Updated.");
+    let articleCnt = await common.getArticleCount();
+
+    sendMessage(
+      "Article Update",
+      crawledSize +
+        " Articles update from Dogdrip.\n" +
+        articleCnt +
+        " articles remain"
+    );
     return { msg: crawledSize + " articls updated from dd" };
   });
 
@@ -48,7 +86,15 @@ exports.scheduledCrawlIsg = functions.pubsub
   .schedule("every 3 hours")
   .onRun(async context => {
     let crawledSize = await isg.crawlInsagirl();
-    sendMessage("Article Update", crawledSize + " Insagirl Articles Updated.");
+    let articleCnt = await common.getArticleCount();
+
+    sendMessage(
+      "Article Update",
+      crawledSize +
+        " Articles update from Insagirl.\n" +
+        articleCnt +
+        " articles remain"
+    );
     return { msg: crawledSize + " articls updated from isg" };
   });
 
@@ -57,9 +103,14 @@ exports.scheduledCrawlIsg = functions.pubsub
 export const crawlBattlepage = functions.https.onRequest(
   async (_, response) => {
     let crawledSize = await bp.crawlBattlepage();
+    let articleCnt = await common.getArticleCount();
+
     sendMessage(
       "Article Update",
-      "Battlepage Articles Updated. Check Your Article!"
+      crawledSize +
+        " Articles update from Battlepage.\n" +
+        articleCnt +
+        " articles remain"
     );
     response.send("Crawl Battlepage Request Called: " + crawledSize);
   }
@@ -67,18 +118,28 @@ export const crawlBattlepage = functions.https.onRequest(
 
 export const crawlDogdrip = functions.https.onRequest(async (_, response) => {
   let crawledSize = await dd.crawlDogdrip();
+  let articleCnt = await common.getArticleCount();
+
   sendMessage(
     "Article Update",
-    "Dogdrip Articles Updated. Check Your Article!"
+    crawledSize +
+      " Articles update from Dogdrip.\n" +
+      articleCnt +
+      " articles remain"
   );
   response.send("Crawl Dogdrip Request Called: " + crawledSize);
 });
 
 export const crawlInsagirl = functions.https.onRequest(async (_, response) => {
   let crawledSize = await isg.crawlInsagirl();
+  let articleCnt = await common.getArticleCount();
+
   sendMessage(
     "Article Update",
-    "Insagirl Articles Updated. Check Your Article!"
+    crawledSize +
+      " Articles update from Insagirl.\n" +
+      articleCnt +
+      " articles remain"
   );
   response.send("Crawl Insagirl Request Called: " + crawledSize);
 });

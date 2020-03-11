@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import analyzeArticle from "../analyze/analyzer";
+import analyzeArticle from "../util/analyzer";
 
 const remove = async () => {
   let removeList: Array<string> = [];
