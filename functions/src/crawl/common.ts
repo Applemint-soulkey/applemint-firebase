@@ -117,13 +117,16 @@ export async function get_history_by_type(type: String) {
   return history;
 }
 
-export async function updateItems(itemList: Array<Item>) {
+export async function updateItems(
+  itemList: Array<Item>,
+  targetDB: string = "article"
+) {
   let db = admin.firestore();
   let batch = db.batch();
   let batch_cnt = 0;
   var batch_list = [];
   for (var item of itemList) {
-    let itemRef = db.collection("article").doc();
+    let itemRef = db.collection(targetDB).doc();
     let historyRef = db.collection("history").doc();
     batch.set(itemRef, Object.assign({}, item));
     batch.set(historyRef, {
@@ -144,4 +147,18 @@ export async function updateItems(itemList: Array<Item>) {
   for (var current_batch of batch_list) {
     await current_batch.commit();
   }
+}
+
+export async function getArticleCount() {
+  let articleCnt = 0;
+
+  let db = admin.firestore();
+  await db
+    .collection("article")
+    .get()
+    .then(snapshot => {
+      articleCnt = snapshot.size;
+    });
+
+  return articleCnt;
 }

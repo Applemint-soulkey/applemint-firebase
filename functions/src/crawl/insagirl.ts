@@ -1,6 +1,7 @@
 import * as common from "./common";
 import Axios from "axios";
 import { URL } from "url";
+var linkify = require("linkifyjs");
 
 let target_list = [
   "http://insagirl-hrm.appspot.com/json2/1/1/2/",
@@ -8,8 +9,7 @@ let target_list = [
 ];
 
 var httpRegex = /(https?:[^\s]+)/;
-var urlRegex = /(?:(?:https?|ftp):\/\/|\b(?:[a-z\d]+\.))(?:(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))?\))+(?:\((?:[^\s()<>]+|(?:\(?:[^\s()<>]+\)))?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))?/;
-var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)/;
+var ignoreRegex = /(lolcast\.kr)|(poooo\.ml)|(dostream\.com)|(op\.gg)|(fow\.kr)/;
 var directLinkRegex = /(\.mp4)|(\.jpg)|(\.png)|(\.gif)/;
 
 class isgItem implements common.Item {
@@ -53,29 +53,32 @@ async function getInsagirlItems(json: string) {
 
   for (var line of json) {
     let detail: string = line.split("|")[2];
-    let detail_url_list = detail.match(urlRegex);
-    if (detail_url_list !== null) {
-      let insaItemUrl = detail_url_list[0];
-      if (
-        history.includes(insaItemUrl) ||
-        insertedUrl.includes(insaItemUrl) ||
-        insaItemUrl.search(ignoreRegex) !== -1
-      ) {
-        continue;
+    let linkList: Array<any> = await linkify.find(detail);
+
+    for (let link of linkList) {
+      if (link !== null && link !== undefined) {
+        let insaItemUrl = link.value;
+        if (
+          history.includes(insaItemUrl) ||
+          insertedUrl.includes(insaItemUrl) ||
+          insaItemUrl.search(ignoreRegex) !== -1
+        ) {
+          continue;
+        }
+        let insaItemContent = detail.replace(insaItemUrl, "").trim();
+        if (insaItemContent.length === 0) {
+          insaItemContent = "";
+        }
+        let item = new isgItem(insaItemUrl, insaItemContent);
+        itemList.push(item);
+        insertedUrl.push(item.url);
       }
-      let insaItemContent = detail.replace(insaItemUrl, "").trim();
-      if (insaItemContent.length === 0) {
-        insaItemContent = "";
-      }
-      let item = new isgItem(insaItemUrl, insaItemContent);
-      itemList.push(item);
-      insertedUrl.push(item.url);
     }
   }
   return itemList;
 }
 
-export async function crawlInsagirl() {
+export async function crawlInsagirl(testMode: boolean = false) {
   let itemList: Array<isgItem> = [];
 
   for (var target of target_list) {
@@ -85,7 +88,12 @@ export async function crawlInsagirl() {
     itemList = itemList.concat(hrmItems);
   }
 
-  await common.updateItems(itemList);
+  if (testMode) {
+    await common.updateItems(itemList, "test_article");
+  } else {
+    await common.updateItems(itemList);
+  }
+
   console.log(itemList);
 
   return itemList.length;
