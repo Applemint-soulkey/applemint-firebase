@@ -35,7 +35,7 @@ const remove = async () => {
 const makeTestArticle = async () => {
   let db = admin.firestore();
   await db
-    .collection("article")
+    .collection("test_article")
     .doc()
     .set({
       crawlSource: "etc",

@@ -57,11 +57,8 @@ exports.scheduledCrawlBp = functions.pubsub
     let articleCnt = await common.getArticleCount();
 
     sendMessage(
-      "Article Update",
-      crawledSize +
-        " Articles update from Battlepage.\n" +
-        articleCnt +
-        " articles remain"
+      crawledSize + " Articles updated from Battlepage",
+      articleCnt + " articles remained. Don't forget Check!"
     );
     return { msg: crawledSize + " articls updated from bp" };
   });
@@ -73,11 +70,8 @@ exports.scheduledCrawldd = functions.pubsub
     let articleCnt = await common.getArticleCount();
 
     sendMessage(
-      "Article Update",
-      crawledSize +
-        " Articles update from Dogdrip.\n" +
-        articleCnt +
-        " articles remain"
+      crawledSize + " Articles updated from Dogdrip",
+      articleCnt + " articles remained. Don't forget Check!"
     );
     return { msg: crawledSize + " articls updated from dd" };
   });
@@ -89,11 +83,8 @@ exports.scheduledCrawlIsg = functions.pubsub
     let articleCnt = await common.getArticleCount();
 
     sendMessage(
-      "Article Update",
-      crawledSize +
-        " Articles update from Insagirl.\n" +
-        articleCnt +
-        " articles remain"
+      crawledSize + " Articles updated from Insagirl",
+      articleCnt + " articles remained. Don't forget Check!"
     );
     return { msg: crawledSize + " articls updated from isg" };
   });
@@ -106,11 +97,8 @@ export const crawlBattlepage = functions.https.onRequest(
     let articleCnt = await common.getArticleCount();
 
     sendMessage(
-      "Article Update",
-      crawledSize +
-        " Articles update from Battlepage.\n" +
-        articleCnt +
-        " articles remain"
+      crawledSize + " Articles updated from Battlepage",
+      articleCnt + " articles remained. Don't forget Check!"
     );
     response.send("Crawl Battlepage Request Called: " + crawledSize);
   }
@@ -121,11 +109,8 @@ export const crawlDogdrip = functions.https.onRequest(async (_, response) => {
   let articleCnt = await common.getArticleCount();
 
   sendMessage(
-    "Article Update",
-    crawledSize +
-      " Articles update from Dogdrip.\n" +
-      articleCnt +
-      " articles remain"
+    crawledSize + " Articles updated from Dogdrip",
+    articleCnt + " articles remained. Don't forget Check!"
   );
   response.send("Crawl Dogdrip Request Called: " + crawledSize);
 });
@@ -135,11 +120,8 @@ export const crawlInsagirl = functions.https.onRequest(async (_, response) => {
   let articleCnt = await common.getArticleCount();
 
   sendMessage(
-    "Article Update",
-    crawledSize +
-      " Articles update from Insagirl.\n" +
-      articleCnt +
-      " articles remain"
+    crawledSize + " Articles updated from Insagirl",
+    articleCnt + " articles remained. Don't forget Check!"
   );
   response.send("Crawl Insagirl Request Called: " + crawledSize);
 });
