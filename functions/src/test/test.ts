@@ -9,8 +9,8 @@ const remove = async () => {
     .collection("article")
     .where("host", "==", "https://https")
     .get()
-    .then(snapshot => {
-      snapshot.forEach(document => {
+    .then((snapshot) => {
+      snapshot.forEach((document) => {
         db.collection("article")
           .doc(document.id)
           .delete()
@@ -18,11 +18,9 @@ const remove = async () => {
             db.collection("history")
               .where("url", "==", document.data().url)
               .get()
-              .then(historySnapshot => {
-                historySnapshot.forEach(historyDocument => {
-                  db.collection("history")
-                    .doc(historyDocument.id)
-                    .delete();
+              .then((historySnapshot) => {
+                historySnapshot.forEach((historyDocument) => {
+                  db.collection("history").doc(historyDocument.id).delete();
                 });
               });
           });
@@ -43,9 +41,9 @@ const makeTestArticle = async () => {
       textContent: "TestCase",
       timestamp: new Date(),
       type: "etc",
-      url: "https://applemint.netlify.com"
+      url: "https://applemint.netlify.com",
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
     });
 };

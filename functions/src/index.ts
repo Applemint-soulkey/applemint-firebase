@@ -52,7 +52,7 @@ exports.createRaindrop = functions.https.onCall(async (data, context) => {
 
 exports.scheduledCrawlBp = functions.pubsub
   .schedule("every 3 hours")
-  .onRun(async context => {
+  .onRun(async (context) => {
     let crawledSize = await bp.crawlBattlepage();
     let articleCnt = await common.getArticleCount();
 
@@ -65,7 +65,7 @@ exports.scheduledCrawlBp = functions.pubsub
 
 exports.scheduledCrawldd = functions.pubsub
   .schedule("every 3 hours")
-  .onRun(async context => {
+  .onRun(async (context) => {
     let crawledSize = await dd.crawlDogdrip();
     let articleCnt = await common.getArticleCount();
 
@@ -78,7 +78,7 @@ exports.scheduledCrawldd = functions.pubsub
 
 exports.scheduledCrawlIsg = functions.pubsub
   .schedule("every 3 hours")
-  .onRun(async context => {
+  .onRun(async (context) => {
     let crawledSize = await isg.crawlInsagirl();
     let articleCnt = await common.getArticleCount();
 
