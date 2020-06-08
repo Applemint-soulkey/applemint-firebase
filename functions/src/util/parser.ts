@@ -26,13 +26,11 @@ const youtubeApi = "https://www.googleapis.com/youtube/v3/videos";
 const imgurAlbumApi = "https://api.imgur.com/3/album/";
 const imgurImageApi = "https://api.imgur.com/3/image/";
 const imgurGalleryApi = "https://api.imgur.com/3/gallery/";
+const twitchAuthApi = "https://id.twitch.tv/oauth2/token";
+const twitchApi = "https://api.twitch.tv/helix/clips?id=";
 const imgurAuth = {
-  Authorization: "Client-ID " + functions.config().imgurapi.key
+  Authorization: "Client-ID " + functions.config().imgurapi.key,
 };
-const twitchAuth = {
-  "Client-ID": functions.config().twitchapi.key
-};
-
 const extractTags = (
   contentElement: any,
   tagName: string,
@@ -168,7 +166,7 @@ const imgurParser = async (document: any, fb_id: string) => {
   if (document.url.includes(albumKeyword)) {
     //album
     let imgurResponse = await axios.get(imgurAlbumApi + imgurHash + "/images", {
-      headers: imgurAuth
+      headers: imgurAuth,
     });
     let imgDataList = await imgurResponse.data.data;
     imgDataList.map((data: any, _: any) => {
@@ -177,7 +175,7 @@ const imgurParser = async (document: any, fb_id: string) => {
   } else if (document.url.includes(galleryKeyword)) {
     //gallery
     let imgurResponse = await axios.get(imgurGalleryApi + imgurHash, {
-      headers: imgurAuth
+      headers: imgurAuth,
     });
     let isAlbum = await imgurResponse.data.data.is_album;
     if (isAlbum) {
@@ -192,7 +190,7 @@ const imgurParser = async (document: any, fb_id: string) => {
   } else {
     //single
     let imgurResponse = await axios.get(imgurImageApi + imgurHash, {
-      headers: imgurAuth
+      headers: imgurAuth,
     });
     let imgData = await imgurResponse.data.data;
     item.midiContents.push(imgData.link);
@@ -227,17 +225,33 @@ const twitchParser = async (document: any, fb_id: string) => {
   let clipIdRegex = /([A-Z])\w+/g;
   let clipUrl = document.url;
 
+  //Check tgd link
   if (tgdRegex.test(document.url)) {
     //tgd
     let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
     clipUrl = await $("#clip-iframe").attr("src");
   }
-  let slug = clipUrl.match(clipIdRegex)![0];
-  let basicResponse = await axios.get(
-    "https://api.twitch.tv/helix/clips?id=" + slug,
-    { headers: twitchAuth }
+
+  //Get Twitch Auth Token
+  let authResponse = await axios.post(
+    twitchAuthApi +
+      "?client_id=" +
+      functions.config().twitchapi.key +
+      "&client_secret=" +
+      functions.config().twitchapi.secret +
+      "&grant_type=client_credentials"
   );
+  let authToken = authResponse.data.access_token;
+
+  //Get Twitch Video URL
+  let slug = clipUrl.match(clipIdRegex)![0];
+  let basicResponse = await axios.get(twitchApi + slug, {
+    headers: {
+      "Client-ID": functions.config().twitchapi.key,
+      Authorization: "Bearer " + authToken,
+    },
+  });
   let clipData = basicResponse.data.data[0];
   item.title = clipData.title;
   let thumb: string = clipData.thumbnail_url;

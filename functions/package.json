@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/bull": "^3.10.2",
+    "@types/chrome": "0.0.107",
     "typescript": "^3.6.2"
   },
   "private": true
