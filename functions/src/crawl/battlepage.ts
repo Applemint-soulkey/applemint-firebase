@@ -4,8 +4,8 @@ import Axios from "axios";
 
 const target_page_size = 5;
 const target_list = [
-  "http://v12.battlepage.com/??=Board.Humor.Table&page=",
-  "http://v12.battlepage.com/??=Board.Etc.Table&page="
+  "https://v12.battlepage.com/??=Board.Humor.Table&page=",
+  "https://v12.battlepage.com/??=Board.Etc.Table&page="
 ];
 
 class bpItem implements common.Item {
