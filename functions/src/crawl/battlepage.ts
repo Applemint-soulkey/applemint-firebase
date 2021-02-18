@@ -38,6 +38,7 @@ async function getBattlepageItems(target: string) {
   let $ = cheerio.load(response.data);
   let $table = $('div[class="ListTable"]');
   $table.find("td.bp_subject").each(async (_: number, element: any) => {
+    console.log(element)
     let element_url = $(element)
       .find("a")
       .attr("href");
