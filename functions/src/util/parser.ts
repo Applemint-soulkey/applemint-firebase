@@ -222,7 +222,7 @@ const twitchParser = async (document: any, fb_id: string) => {
   item.description = document.textContent;
 
   let tgdRegex = /tgd\.kr/g;
-  let clipIdRegex = /([A-Z])\w+/g;
+  // let clipIdRegex = /([A-Z])\w+/g;
   let clipUrl = document.url;
 
   //Check tgd link
@@ -245,13 +245,14 @@ const twitchParser = async (document: any, fb_id: string) => {
   let authToken = authResponse.data.access_token;
 
   //Get Twitch Video URL
-  let slug = clipUrl.match(clipIdRegex)![0];
+  let slug = clipUrl.split('/').pop()
   let basicResponse = await axios.get(twitchApi + slug, {
     headers: {
       "Client-ID": functions.config().twitchapi.key,
       Authorization: "Bearer " + authToken,
     },
   });
+  
   let clipData = basicResponse.data.data[0];
   item.title = clipData.title;
   let thumb: string = clipData.thumbnail_url;
