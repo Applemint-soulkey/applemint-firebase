@@ -10,12 +10,12 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "8"
+    "node": "10"
   },
   "main": "lib/index.js",
   "dependencies": {
     "@types/cheerio": "^0.22.13",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.3",
     "crawler": "^1.2.1",
     "firebase-admin": "^8.4.0",
