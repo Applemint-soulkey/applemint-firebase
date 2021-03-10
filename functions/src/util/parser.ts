@@ -1,7 +1,8 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import functions = require("firebase-functions");
 const getYoutubeID = require("get-youtube-id");
-const functions = require("firebase-functions");
+const urlParse = require("url-parse");
 
 class AnalyzeResult {
   targetUrl: string = "";
@@ -245,14 +246,16 @@ const twitchParser = async (document: any, fb_id: string) => {
   let authToken = authResponse.data.access_token;
 
   //Get Twitch Video URL
-  let slug = clipUrl.split('/').pop()
+  let clipUrlData = urlParse(clipUrl, true);
+  let slug = clipUrlData.pathname.replace("/", "");
+  //let slug = clipUrl.split('/').pop()
   let basicResponse = await axios.get(twitchApi + slug, {
     headers: {
       "Client-ID": functions.config().twitchapi.key,
       Authorization: "Bearer " + authToken,
     },
   });
-  
+
   let clipData = basicResponse.data.data[0];
   item.title = clipData.title;
   let thumb: string = clipData.thumbnail_url;

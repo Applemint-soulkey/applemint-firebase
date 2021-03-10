@@ -4,8 +4,8 @@ const functions = require("firebase-functions");
 const raindropAPi = "https://api.raindrop.io";
 const raindropHeaders = {
   headers: {
-    Authorization: "Bearer " + functions.config().raindropapi.key
-  }
+    Authorization: "Bearer " + functions.config().raindropapi.key,
+  },
 };
 
 const getCollections = async () => {
@@ -18,7 +18,7 @@ const getCollections = async () => {
     collections.map((value: any, index: number) => {
       collectionPairs.push({
         label: value.title,
-        value: value._id.toString()
+        value: value._id.toString(),
       });
     });
   }
@@ -33,12 +33,12 @@ const createRaindrop = async (
 ) => {
   let api = raindropAPi + "/rest/v1/raindrop";
   let body = {
-    url: url,
+    link: url,
     title: title,
     collection: {
-      $id: collectionId
+      $id: collectionId,
     },
-    tags: tags
+    tags: tags,
   };
   let response = await axios.post(api, body, raindropHeaders);
   if (response.status === 200) {
