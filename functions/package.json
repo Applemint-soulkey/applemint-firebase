@@ -22,7 +22,8 @@
     "firebase-functions": "^3.1.0",
     "get-youtube-id": "^1.0.1",
     "iconv-lite": "^0.5.0",
-    "linkifyjs": "^2.1.9"
+    "linkifyjs": "^2.1.9",
+    "url-parse": "^1.5.1"
   },
   "devDependencies": {
     "@types/bull": "^3.10.2",
