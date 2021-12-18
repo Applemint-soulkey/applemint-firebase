@@ -1,12 +1,16 @@
 import * as cheerio from "cheerio";
 import * as common from "./common";
 import Axios from "axios";
+import * as https from "https";
 
 const target_page_size = 5;
 const target_list = [
   "https://v12.battlepage.com/??=Board.Humor.Table&page=",
   "https://v12.battlepage.com/??=Board.Etc.Table&page=",
 ];
+const agent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 class bpItem implements common.Item {
   url: string;
@@ -34,16 +38,16 @@ async function getBattlepageItems(target: string) {
   // let history: Array<string> = await common.get_history_list()
   let history: Array<string> = await common.get_history_by_type("bp");
   let itemList: Array<bpItem> = [];
-  let response = await Axios.get(target);
+  let response = await Axios.get(target, { httpsAgent: agent });
   let $ = cheerio.load(response.data);
   let $table = $('div[class="ListTable"]');
   $table.find("td.bp_subject").each(async (_: number, element: any) => {
     console.log(element);
     let element_url = $(element).find("a").attr("href");
-    if (element_url.startsWith("/")) {
+    if (element_url!.startsWith("/")) {
       element_url = "https://v12.battlepage.com" + element_url;
     }
-    var item = new bpItem(element_url, element.attribs.title);
+    var item = new bpItem(element_url!, element.attribs.title);
     if (!history.includes(item.url)) {
       itemList.push(item);
     }
