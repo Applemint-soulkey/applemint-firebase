@@ -40,10 +40,10 @@ async function getBattlepageItems(target: string) {
   $table.find("td.bp_subject").each(async (_: number, element: any) => {
     console.log(element);
     let element_url = $(element).find("a").attr("href");
-    if (element_url.startsWith("/")) {
+    if (element_url!.startsWith("/")) {
       element_url = "https://v12.battlepage.com" + element_url;
     }
-    var item = new bpItem(element_url, element.attribs.title);
+    var item = new bpItem(element_url!, element.attribs.title);
     if (!history.includes(item.url)) {
       itemList.push(item);
     }

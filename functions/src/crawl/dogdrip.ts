@@ -31,10 +31,8 @@ async function getDogdripItems(target: string) {
   let $ = cheerio.load(response.data);
   let $table = $("tbody", 'table[class="ed table table-divider"]');
   $table.find(".ed.link-reset").each(async (_, element) => {
-    let element_url = element.attribs.href;
-    let element_content = $(element)
-      .find(".ed.title-link")
-      .text();
+    let element_url = (element as any).attribs.href;
+    let element_content = $(element).find(".ed.title-link").text();
     var item = new ddItem(element_url, element_content);
     if (!history.includes(item.url) && item.url != "#popup_menu_area") {
       itemList.push(item);

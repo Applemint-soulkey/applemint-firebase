@@ -140,7 +140,7 @@ export const remover = functions.https.onRequest(async (request, response) => {
 
 export const testAnalyze = functions.https.onRequest(
   async (request, response) => {
-    let data = await test.testAnalyze(request.query.id);
+    let data = await test.testAnalyze(request.query.id as string);
     response.send(data);
   }
 );
