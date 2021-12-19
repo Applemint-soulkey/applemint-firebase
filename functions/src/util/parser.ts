@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import * as https from "https";
 import functions = require("firebase-functions");
 const getYoutubeID = require("get-youtube-id");
 const urlParse = require("url-parse");
@@ -50,6 +51,9 @@ const extractTags = (
   }
   return tagSrcs;
 };
+const agent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 const bpParser = async (document: any, fb_id: string) => {
   let bpItem = new AnalyzeResult();
@@ -58,7 +62,9 @@ const bpParser = async (document: any, fb_id: string) => {
   bpItem.title = document.textContent;
 
   try {
-    let response = await axios.get(document.url);
+    let response = await axios.get(document.url, {
+      httpsAgent: agent,
+    });
     let $ = cheerio.load(response.data);
     let pageElement = $(".search_content");
 
@@ -87,7 +93,7 @@ const ddParser = async (document: any, fb_id: string) => {
   try {
     let response = await axios.get(document.url);
     let $ = cheerio.load(response.data);
-    let pageElement = await $("#article_1");
+    let pageElement = $("#article_1");
 
     extractTags(pageElement, "img").map((value, _) => {
       ddItem.midiContents.push(
